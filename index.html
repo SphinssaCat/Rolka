@@ -1,277 +1,421 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Архив Всея Ролки</title>
-  <style>
-    :root {
-      --bg-color: #ffffff;
-      --text-color: #f1c40f; /* золотисто-жёлтый */
-      --accent-color: #f39c12; /* оранжево-золотой */
-      --black-color: #000000;
-      --gradient-top: #000000;
-      --gradient-bottom: #3e2723;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Архив Всея Ролки</title>
+    <style>
+        /* --- СТИЛИ ПОД ВАШ ДИЗАЙН --- */
+        :root {
+            --bg-color: #000000;
+            --card-bg: #111111;
+            --text-color: #fff;
+            --accent: #FFD700; /* Золотой цвет */
+            --border-color: #333;
+            --font-main: 'Arial', sans-serif;
+        }
 
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg-color);
-      font-family: 'Arial', sans-serif;
-      color: var(--text-color);
-      overflow-x: hidden;
-    }
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
 
-    /* Заголовок */
-    header {
-      text-align: center;
-      padding: 40px 20px;
-    }
+        h1 {
+            text-align: center;
+            color: var(--accent);
+            font-size: 3rem;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
 
-    h1 {
-      font-size: 3rem;
-      font-weight: 400;
-      margin: 0;
-      line-height: 1.1;
-      font-style: italic;
-      color: var(--text-color);
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
+        /* Навигация / Кнопки управления */
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .btn:hover { background: #ffcc00; }
+        .btn-danger { background: #ff4d4d; color: white; }
 
-    /* Контейнер для слайдера */
-    .slider-container {
-      position: relative;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-      overflow: hidden;
-    }
+        /* Сетка карточек (Адаптивная) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    .slider-track {
-      display: flex;
-      gap: 20px;
-      transition: transform 0.5s ease-in-out;
-    }
+        /* Дизайн карточки (в стиле вашего скрина) */
+        .card {
+            background: var(--card-bg);
+            border-left: 5px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .card:hover { transform: translateY(-5px); }
+        
+        /* Треугольный вырез сверху */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 0; height: 0;
+            border-top: 60px solid var(--accent);
+            border-right: 60px solid transparent;
+            border-left: 60px solid transparent;
+            z-index: 1;
+        }
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 0; height: 0;
+            border-top: 60px solid var(--bg-color);
+            border-right: 60px solid transparent;
+            border-left: 60px solid transparent;
+            z-index: 2;
+            margin-top: 1px; /* Чуть ниже, чтобы перекрыть границу */
+        }
 
-    /* Карточки-полки */
-    .shelf-card {
-      min-width: 280px;
-      width: 280px;
-      aspect-ratio: 2/5; /* пропорции как на макете */
-      position: relative;
-      background: linear-gradient(to bottom, var(--gradient-top), var(--gradient-bottom));
-      border: 4px solid var(--accent-color);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+        .card-content {
+            padding: 20px;
+            margin-top: 40px; /* Отступ под треугольник */
+            z-index: 3;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
 
-    /* Белый треугольник */
-    .shelf-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 0;
-      height: 0;
-      border-top: 200px solid #ffffff;
-      border-left: 200px solid transparent;
-      z-index: 1;
-    }
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        .card-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
 
-    /* Область для контента (картинка или фон) */
-    .shelf-content {
-      flex-grow: 1;
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-
-    /* Вариант 1: вставить картинку */
-    .shelf-content img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    /* Вариант 2: оставить градиентный фон (альтернатива картинке) */
-    .shelf-content.gradient-bg {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.3));
-    }
-
-    /* Название и описание */
-    .shelf-info {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: var(--text-color);
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-      z-index: 3;
-      pointer-events: none;
-    }
-
-    .shelf-info h3 {
-      margin: 0 0 4px 0;
-      font-size: 1rem;
-      line-height: 1.2;
-    }
-
-    .shelf-info p {
-      margin: 0;
-      font-size: 0.85rem;
-      line-height: 1.2;
-    }
-
-    /* Стрелки навигации */
-    .nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 50px;
-      height: 50px;
-      background-color: var(--accent-color);
-      border: none;
-      border-radius: 50%;
-      color: var(--black-color);
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: transform 0.2s, background-color 0.2s;
-    }
-
-    .nav-btn:hover {
-      transform: translateY(-50%) scale(1.1);
-      background-color: #d35400;
-    }
-
-    .prev-btn {
-      left: 10px;
-    }
-
-    .next-btn {
-      right: 10px;
-    }
-
-    /* Адаптивность */
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 2rem;
-      }
-      .shelf-card {
-        min-width: 220px;
-        width: 220px;
-      }
-    }
-  </style>
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background: #111;
+            padding: 30px;
+            border: 1px solid var(--accent);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px; right: 15px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 1.5rem;
+        }
+        
+        input, textarea {
+            width: 100%;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        
+        /* Мобильная адаптация */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .card::before, .card::after {
+                border-top-width: 40px;
+                border-right-width: 40px;
+                border-left-width: 40px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
+
     <h1>Архив Всея Ролки</h1>
-  </header>
 
-  <div class="slider-container">
-    <button class="nav-btn prev-btn" id="prevBtn">&#10094;</button>
-    <div class="slider-track" id="track">
-      <!-- Карточка 1: с картинкой -->
-      <div class="shelf-card">
-        <div class="shelf-info">
-          <h3>[название]</h3>
-          <p>[описание]</p>
-        </div>
-        <div class="shelf-content">
-          <!-- Вставьте путь к картинке в src -->
-          <img src="images/shelf1.jpg" alt="Полка 1" />
-        </div>
-      </div>
-
-      <!-- Карточка 2: с картинкой -->
-      <div class="shelf-card">
-        <div class="shelf-info">
-          <h3>[название]</h3>
-          <p>[описание]</p>
-        </div>
-        <div class="shelf-content">
-          <img src="images/shelf2.jpg" alt="Полка 2" />
-        </div>
-      </div>
-
-      <!-- Карточка 3: с градиентным фоном вместо картинки -->
-      <div class="shelf-card">
-        <div class="shelf-info">
-          <h3>[название]</h3>
-          <p>[описание]</p>
-        </div>
-        <div class="shelf-content gradient-bg">
-          <!-- Здесь нет картинки, только фон -->
-        </div>
-      </div>
-
-      <!-- Карточка 4: с картинкой -->
-      <div class="shelf-card">
-        <div class="shelf-info">
-          <h3>[название]</h3>
-          <p>[описание]</p>
-        </div>
-        <div class="shelf-content">
-          <img src="images/shelf4.jpg" alt="Полка 4" />
-        </div>
-      </div>
+    <div class="controls">
+        <button class="btn" onclick="openAdminPanel()">🔐 Вход для админа</button>
+        <button class="btn btn-danger" onclick="logout()">🚪 Выйти</button>
     </div>
-    <button class="nav-btn next-btn" id="nextBtn">&#10095;</button>
-  </div>
 
-  <script>
-    const track = document.getElementById('track');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    let currentIndex = 0;
-    const cardWidth = 300; // ширина карточки + отступы
-    const gap = 20;
+    <div id="grid" class="grid-container">
+        <!-- Карточки будут здесь -->
+    </div>
 
-    function updateSlider() {
-      const offset = -(currentIndex * (cardWidth + gap));
-      track.style.transform = `translateX(\${offset}px)`;
-    }
+    <!-- Модальное окно для добавления/редактирования -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('editModal')">&times;</span>
+            <h2 id="modalTitle">Новая Ролка</h2>
+            <input type="text" id="inpTitle" placeholder="Название">
+            <textarea id="inpDesc" rows="4" placeholder="Описание"></textarea>
+            <input type="file" id="inpImage" accept="image/*">
+            <img id="previewImg" src="" style="max-width:100%; display:none; margin-bottom:10px;">
+            <button class="btn" onclick="saveItem()">Сохранить</button>
+        </div>
+    </div>
 
-    nextBtn.addEventListener('click', () => {
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      const currentScroll = -parseInt(track.style.transform.replace('translateX(', '').replace('px)', '')) || 0;
-      if (currentScroll < maxScroll) {
-        currentIndex++;
-        updateSlider();
-      }
-    });
+    <!-- Панель админа (логин) -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('adminModal')">&times;</span>
+            <h2>Админ-панель</h2>
+            <p>Для работы сайта требуется GitHub Token.</p>
+            <input type="password" id="ghToken" placeholder="Введите GitHub Personal Access Token">
+            <button class="btn" onclick="login()">Войти</button>
+            <p style="font-size:0.8em; color:#aaa; margin-top:10px;">
+                Где взять токен: Settings -> Developer settings -> Personal access tokens -> Tokens (classic)
+            </p>
+        </div>
+    </div>
 
-    prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateSlider();
-      }
-    });
+    <script>
+        // === КОНФИГУРАЦИЯ ===
+        const CONFIG = {
+            owner: 'SphinssaCat', // ЗАМЕНИТЬ
+            repo: 'Rolka',     // ЗАМЕНИТЬ
+            branch: 'main',
+            dataFile: 'data.json'
+        };
 
-    // Адаптация ширины карточки под экран
-    function resizeCard() {
-      const containerWidth = document.querySelector('.slider-container').clientWidth;
-      const visibleCards = Math.max(1, Math.floor(containerWidth / (cardWidth + gap)));
-      const newWidth = (containerWidth - (visibleCards - 1) * gap) / visibleCards;
-      document.querySelectorAll('.shelf-card').forEach(card => {
-        card.style.width = `\${newWidth}px`;
-        card.style.minWidth = `\${newWidth}px`;
-      });
-    }
+        let isAdmin = false;
+        let ghToken = localStorage.getItem('gh_token');
+        let items = ;
 
-    window.addEventListener('resize', resizeCard);
-    resizeCard();
-  </script>
+        // === ИНИЦИАЛИЗАЦИЯ ===
+        async function init() {
+            if (ghToken) {
+                isAdmin = true;
+                await loadData();
+                renderGrid();
+            } else {
+                openAdminPanel();
+            }
+        }
+
+        // === РАБОТА С GITHUB API ===
+        async function loadData() {
+            const url = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.dataFile}?ref=${CONFIG.branch}`;
+            const headers = { 'Authorization': `token \${ghToken}` };
+            
+            try {
+                const res = await fetch(url, { headers });
+                if (!res.ok) throw new Error('Файл не найден или ошибка доступа');
+                const json = await res.json();
+                const content = atob(json.content);
+                items = JSON.parse(content) || ;
+            } catch (e) {
+                console.error(e);
+                items = ;
+            }
+        }
+
+        async function saveData() {
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(items, null, 2))));
+            
+            // Сначала получаем текущий SHA файла
+            const checkRes = await fetch(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.dataFile}?ref=${CONFIG.branch}`, { headers: { 'Authorization': `token \${ghToken}` } });
+            let sha = null;
+            if (checkRes.ok) {
+                const checkJson = await checkRes.json();
+                sha = checkJson.sha;
+            }
+
+            const body = {
+                message: 'Update data.json',
+                content,
+                branch: CONFIG.branch,
+                ...(sha && { sha })
+            };
+
+            const res = await fetch(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/\${CONFIG.dataFile}`, {
+                method: 'PUT',
+                headers: { 
+                    'Authorization': `token \${ghToken}`, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message);
+            }
+            alert('Данные успешно сохранены!');
+        }
+
+        // === ЛОГИКА САЙТА ===
+        function renderGrid() {
+            const container = document.getElementById('grid');
+            container.innerHTML = '';
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#666;">Пока нет ролок. Добавьте первую!</p>';
+                return;
+            }
+
+            items.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => openEdit(index);
+                
+                card.innerHTML = `
+                    <div class="card-content">
+                        <h3 class="card-title">\${escapeHtml(item.title)}</h3>
+                        <p class="card-desc">\${escapeHtml(item.description)}</p>
+                        ${item.image ? `<img src="${item.image}" style="width:100%; height:150px; object-fit:cover; margin-top:10px;">` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openEdit(index = -1) {
+            const modal = document.getElementById('editModal');
+            const titleInput = document.getElementById('inpTitle');
+            const descInput = document.getElementById('inpDesc');
+            const preview = document.getElementById('previewImg');
+            const modalTitle = document.getElementById('modalTitle');
+
+            if (index === -1) {
+                // Новый элемент
+                titleInput.value = '';
+                descInput.value = '';
+                preview.src = '';
+                preview.style.display = 'none';
+                modalTitle.innerText = 'Новая Ролка';
+                window.currentIndex = -1;
+            } else {
+                // Редактирование
+                const item = items[index];
+                titleInput.value = item.title;
+                descInput.value = item.description;
+                if (item.image) {
+                    preview.src = item.image;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+                modalTitle.innerText = 'Редактировать Ролку';
+                window.currentIndex = index;
+            }
+            modal.style.display = 'flex';
+        }
+
+        function saveItem() {
+            const title = document.getElementById('inpTitle').value;
+            const desc = document.getElementById('inpDesc').value;
+            const fileInput = document.getElementById('inpImage');
+            const preview = document.getElementById('previewImg');
+
+            if (!title) { alert('Введите название'); return; }
+
+            // Обработка картинки (упрощенная: берем URL если есть, иначе null)
+            // В полной версии нужно загружать картинку в репозиторий отдельно
+            let imageUrl = null;
+            if (fileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    imageUrl = e.target.result; // Data URL (временное решение для демо)
+                    finishSave(title, desc, imageUrl);
+                };
+                reader.readAsDataURL(fileInput.files);
+            } else {
+                finishSave(title, desc, imageUrl);
+            }
+        }
+
+        function finishSave(title, desc, image) {
+            if (window.currentIndex === -1) {
+                items.push({ title, description: desc, image });
+            } else {
+                items[window.currentIndex] = { title, description: desc, image };
+            }
+            
+            // Сохраняем в GitHub
+            saveData().then(() => {
+                closeModal('editModal');
+                renderGrid();
+            });
+        }
+
+        function openAdminPanel() {
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+
+        function login() {
+            const token = document.getElementById('ghToken').value;
+            if (token) {
+                ghToken = token;
+                localStorage.setItem('gh_token', token);
+                isAdmin = true;
+                closeModal('adminModal');
+                init();
+            } else {
+                alert('Введите токен!');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('gh_token');
+            location.reload();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Запуск
+        init();
+    </script>
 </body>
 </html>
