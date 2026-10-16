@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Архив Всея Ролки</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #f1c40f; /* золотисто-жёлтый */
+      --accent-color: #f39c12; /* оранжево-золотой */
+      --black-color: #000000;
+      --gradient-top: #000000;
+      --gradient-bottom: #3e2723;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      font-family: 'Arial', sans-serif;
+      color: var(--text-color);
+      overflow-x: hidden;
+    }
+
+    /* Заголовок */
+    header {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 400;
+      margin: 0;
+      line-height: 1.1;
+      font-style: italic;
+      color: var(--text-color);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Контейнер для слайдера */
+    .slider-container {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      overflow: hidden;
+    }
+
+    .slider-track {
+      display: flex;
+      gap: 20px;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    /* Карточки-полки */
+    .shelf-card {
+      min-width: 280px;
+      width: 280px;
+      aspect-ratio: 2/5; /* пропорции как на макете */
+      position: relative;
+      background: linear-gradient(to bottom, var(--gradient-top), var(--gradient-bottom));
+      border: 4px solid var(--accent-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Белый треугольник */
+    .shelf-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-top: 200px solid #ffffff;
+      border-left: 200px solid transparent;
+      z-index: 1;
+    }
+
+    /* Область для контента (картинка или фон) */
+    .shelf-content {
+      flex-grow: 1;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    /* Вариант 1: вставить картинку */
+    .shelf-content img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Вариант 2: оставить градиентный фон (альтернатива картинке) */
+    .shelf-content.gradient-bg {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.3));
+    }
+
+    /* Название и описание */
+    .shelf-info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: var(--text-color);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .shelf-info h3 {
+      margin: 0 0 4px 0;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .shelf-info p {
+      margin: 0;
+      font-size: 0.85rem;
+      line-height: 1.2;
+    }
+
+    /* Стрелки навигации */
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 50px;
+      height: 50px;
+      background-color: var(--accent-color);
+      border: none;
+      border-radius: 50%;
+      color: var(--black-color);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-50%) scale(1.1);
+      background-color: #d35400;
+    }
+
+    .prev-btn {
+      left: 10px;
+    }
+
+    .next-btn {
+      right: 10px;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      .shelf-card {
+        min-width: 220px;
+        width: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Архив Всея Ролки</h1>
+  </header>
+
+  <div class="slider-container">
+    <button class="nav-btn prev-btn" id="prevBtn">&#10094;</button>
+    <div class="slider-track" id="track">
+      <!-- Карточка 1: с картинкой -->
+      <div class="shelf-card">
+        <div class="shelf-info">
+          <h3>[название]</h3>
+          <p>[описание]</p>
+        </div>
+        <div class="shelf-content">
+          <!-- Вставьте путь к картинке в src -->
+          <img src="images/shelf1.jpg" alt="Полка 1" />
+        </div>
+      </div>
+
+      <!-- Карточка 2: с картинкой -->
+      <div class="shelf-card">
+        <div class="shelf-info">
+          <h3>[название]</h3>
+          <p>[описание]</p>
+        </div>
+        <div class="shelf-content">
+          <img src="images/shelf2.jpg" alt="Полка 2" />
+        </div>
+      </div>
+
+      <!-- Карточка 3: с градиентным фоном вместо картинки -->
+      <div class="shelf-card">
+        <div class="shelf-info">
+          <h3>[название]</h3>
+          <p>[описание]</p>
+        </div>
+        <div class="shelf-content gradient-bg">
+          <!-- Здесь нет картинки, только фон -->
+        </div>
+      </div>
+
+      <!-- Карточка 4: с картинкой -->
+      <div class="shelf-card">
+        <div class="shelf-info">
+          <h3>[название]</h3>
+          <p>[описание]</p>
+        </div>
+        <div class="shelf-content">
+          <img src="images/shelf4.jpg" alt="Полка 4" />
+        </div>
+      </div>
+    </div>
+    <button class="nav-btn next-btn" id="nextBtn">&#10095;</button>
+  </div>
+
+  <script>
+    const track = document.getElementById('track');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let currentIndex = 0;
+    const cardWidth = 300; // ширина карточки + отступы
+    const gap = 20;
+
+    function updateSlider() {
+      const offset = -(currentIndex * (cardWidth + gap));
+      track.style.transform = `translateX(\${offset}px)`;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      const currentScroll = -parseInt(track.style.transform.replace('translateX(', '').replace('px)', '')) || 0;
+      if (currentScroll < maxScroll) {
+        currentIndex++;
+        updateSlider();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateSlider();
+      }
+    });
+
+    // Адаптация ширины карточки под экран
+    function resizeCard() {
+      const containerWidth = document.querySelector('.slider-container').clientWidth;
+      const visibleCards = Math.max(1, Math.floor(containerWidth / (cardWidth + gap)));
+      const newWidth = (containerWidth - (visibleCards - 1) * gap) / visibleCards;
+      document.querySelectorAll('.shelf-card').forEach(card => {
+        card.style.width = `\${newWidth}px`;
+        card.style.minWidth = `\${newWidth}px`;
+      });
+    }
+
+    window.addEventListener('resize', resizeCard);
+    resizeCard();
+  </script>
+</body>
+</html>
