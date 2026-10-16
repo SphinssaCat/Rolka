@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Архив Всея Ролки</title>
     <style>
-        /* --- СТИЛИ ПОД ВАШ ДИЗАЙН --- */
         :root {
             --bg-color: #000000;
             --card-bg: #111111;
             --text-color: #fff;
-            --accent: #FFD700; /* Золотой цвет */
+            --accent: #FFD700;
             --border-color: #333;
             --font-main: 'Arial', sans-serif;
         }
@@ -33,11 +32,11 @@
             letter-spacing: 2px;
         }
 
-        /* Навигация / Кнопки управления */
         .controls {
             text-align: center;
             margin-bottom: 30px;
         }
+        
         .btn {
             padding: 10px 20px;
             background: var(--accent);
@@ -47,11 +46,11 @@
             font-weight: bold;
             border-radius: 5px;
             transition: 0.3s;
+            margin: 0 5px;
         }
         .btn:hover { background: #ffcc00; }
         .btn-danger { background: #ff4d4d; color: white; }
 
-        /* Сетка карточек (Адаптивная) */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -61,7 +60,6 @@
             margin: 0 auto;
         }
 
-        /* Дизайн карточки (в стиле вашего скрина) */
         .card {
             background: var(--card-bg);
             border-left: 5px solid var(--accent);
@@ -75,7 +73,7 @@
         }
         .card:hover { transform: translateY(-5px); }
         
-        /* Треугольный вырез сверху */
+        /* Стилизация под ваш референс (треугольники) */
         .card::before {
             content: '';
             position: absolute;
@@ -95,29 +93,20 @@
             border-right: 60px solid transparent;
             border-left: 60px solid transparent;
             z-index: 2;
-            margin-top: 1px; /* Чуть ниже, чтобы перекрыть границу */
+            margin-top: 1px;
         }
 
         .card-content {
             padding: 20px;
-            margin-top: 40px; /* Отступ под треугольник */
+            margin-top: 40px;
             z-index: 3;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
-        .card-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: var(--accent);
-        }
-        .card-desc {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            line-height: 1.4;
-            flex-grow: 1;
-        }
+        .card-title { font-size: 1.2rem; margin-bottom: 10px; color: var(--accent); }
+        .card-desc { font-size: 0.9rem; opacity: 0.8; line-height: 1.4; flex-grow: 1; }
 
         /* Модальные окна */
         .modal {
@@ -157,7 +146,6 @@
             box-sizing: border-box;
         }
         
-        /* Мобильная адаптация */
         @media (max-width: 600px) {
             h1 { font-size: 2rem; }
             .card::before, .card::after {
@@ -166,6 +154,14 @@
                 border-left-width: 40px;
             }
         }
+        
+        /* Сообщение об ошибке */
+        .error-msg {
+            color: #ff4d4d;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
@@ -173,12 +169,13 @@
     <h1>Архив Всея Ролки</h1>
 
     <div class="controls">
-        <button class="btn" onclick="openAdminPanel()">🔐 Вход для админа</button>
-        <button class="btn btn-danger" onclick="logout()">🚪 Выйти</button>
+        <!-- Кнопки теперь будут работать, если скрипт загрузился -->
+        <button class="btn" id="btnLogin" onclick="openAdminPanel()">🔐 Вход для админа</button>
+        <button class="btn btn-danger" id="btnLogout" onclick="logout()" style="display:none;">🚪 Выйти</button>
     </div>
 
     <div id="grid" class="grid-container">
-        <!-- Карточки будут здесь -->
+        <!-- Карточки -->
     </div>
 
     <!-- Модальное окно для добавления/редактирования -->
@@ -209,26 +206,33 @@
     </div>
 
     <script>
-        // === КОНФИГУРАЦИЯ ===
+        // === КОНФИГУРАЦИЯ (ОБЯЗАТЕЛЬНО ИЗМЕНИТЬ) ===
         const CONFIG = {
-            owner: 'SphinssaCat', // ЗАМЕНИТЬ
-            repo: 'Rolka',     // ЗАМЕНИТЬ
+            owner: 'SphinssaCat', // ЗАМЕНИТЬ НА ВАШ НИК
+            repo: 'Rolka',     // ЗАМЕНИТЬ НА НАЗВАНИЕ РЕПО
             branch: 'main',
             dataFile: 'data.json'
         };
 
         let isAdmin = false;
         let ghToken = localStorage.getItem('gh_token');
-        let items = ;
+        let items = ; // ИСПРАВЛЕНО: теперь это пустой массив, а не ошибка синтаксиса
 
         // === ИНИЦИАЛИЗАЦИЯ ===
         async function init() {
+            const btnLogin = document.getElementById('btnLogin');
+            const btnLogout = document.getElementById('btnLogout');
+
             if (ghToken) {
                 isAdmin = true;
+                btnLogin.style.display = 'none';
+                btnLogout.style.display = 'inline-block';
                 await loadData();
                 renderGrid();
             } else {
-                openAdminPanel();
+                btnLogin.style.display = 'inline-block';
+                btnLogout.style.display = 'none';
+                renderGrid(); // Покажем пустой список или заглушку
             }
         }
 
@@ -239,13 +243,17 @@
             
             try {
                 const res = await fetch(url, { headers });
-                if (!res.ok) throw new Error('Файл не найден или ошибка доступа');
+                if (!res.ok) throw new Error('Файл не найден или ошибка доступа. Проверьте токен и название файла.');
+                
                 const json = await res.json();
                 const content = atob(json.content);
                 items = JSON.parse(content) || ;
             } catch (e) {
                 console.error(e);
                 items = ;
+                // Показываем ошибку пользователю, если не удалось загрузить
+                const grid = document.getElementById('grid');
+                grid.innerHTML = `<p class="error-msg">Ошибка загрузки данных: \${e.message}. Проверьте консоль (F12) и настройки GitHub.</p>`;
             }
         }
 
@@ -261,7 +269,7 @@
             }
 
             const body = {
-                message: 'Update data.json',
+                message: 'Update data.json via site',
                 content,
                 branch: CONFIG.branch,
                 ...(sha && { sha })
@@ -278,9 +286,9 @@
 
             if (!res.ok) {
                 const err = await res.json();
-                throw new Error(err.message);
+                throw new Error(err.message || 'Неизвестная ошибка при сохранении');
             }
-            alert('Данные успешно сохранены!');
+            alert('Данные успешно сохранены в GitHub!');
         }
 
         // === ЛОГИКА САЙТА ===
@@ -289,7 +297,7 @@
             container.innerHTML = '';
             
             if (items.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#666;">Пока нет ролок. Добавьте первую!</p>';
+                container.innerHTML = '<p style="text-align:center; color:#666; grid-column: 1/-1;">Пока нет ролок. Добавьте первую через панель админа!</p>';
                 return;
             }
 
@@ -317,7 +325,6 @@
             const modalTitle = document.getElementById('modalTitle');
 
             if (index === -1) {
-                // Новый элемент
                 titleInput.value = '';
                 descInput.value = '';
                 preview.src = '';
@@ -325,7 +332,6 @@
                 modalTitle.innerText = 'Новая Ролка';
                 window.currentIndex = -1;
             } else {
-                // Редактирование
                 const item = items[index];
                 titleInput.value = item.title;
                 descInput.value = item.description;
@@ -349,16 +355,14 @@
 
             if (!title) { alert('Введите название'); return; }
 
-            // Обработка картинки (упрощенная: берем URL если есть, иначе null)
-            // В полной версии нужно загружать картинку в репозиторий отдельно
             let imageUrl = null;
             if (fileInput.files.length > 0) {
                 const reader = new FileReader();
                 reader.onload = async (e) => {
-                    imageUrl = e.target.result; // Data URL (временное решение для демо)
+                    imageUrl = e.target.result; 
                     finishSave(title, desc, imageUrl);
                 };
-                reader.readAsDataURL(fileInput.files);
+                reader.readAsDataURL(fileInput.files); // ИСПРАВЛЕНО: files
             } else {
                 finishSave(title, desc, imageUrl);
             }
@@ -371,10 +375,11 @@
                 items[window.currentIndex] = { title, description: desc, image };
             }
             
-            // Сохраняем в GitHub
             saveData().then(() => {
                 closeModal('editModal');
                 renderGrid();
+            }).catch(err => {
+                alert('Ошибка сохранения: ' + err.message);
             });
         }
 
